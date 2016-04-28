@@ -4,10 +4,10 @@
         <entry key="AutoNetkit.enable_cdp" type="Boolean">true</entry>
         <entry key="AutoNetkit.infrastructure_only" type="Boolean">true</entry>
     </extensions>
-    <node name="R2" type="SIMPLE" subtype="IOSv" location="385,64">
+    <node name="R2" type="SIMPLE" subtype="IOSv" location="380,90">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:43
+            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 hostname R2
@@ -78,7 +78,7 @@ interface GigabitEthernet0/1
   no shutdown
 !
 interface GigabitEthernet0/2
-  description to iosvl2-2
+  description to SW2
   no ip address
   cdp enable
   duplex full
@@ -95,10 +95,10 @@ end
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="R4" type="SIMPLE" subtype="IOSv" location="385,259">
+    <node name="R4" type="SIMPLE" subtype="IOSv" location="380,244">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:43
+            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 hostname R4
@@ -169,7 +169,7 @@ interface GigabitEthernet0/1
   no shutdown
 !
 interface GigabitEthernet0/2
-  description to iosvl2-4
+  description to SW4
   no ip address
   cdp enable
   duplex full
@@ -186,10 +186,10 @@ end
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="R1" type="SIMPLE" subtype="IOSv" location="268,157">
+    <node name="R1" type="SIMPLE" subtype="IOSv" location="285,153">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:43
+            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 hostname R1
@@ -260,7 +260,7 @@ interface GigabitEthernet0/1
   no shutdown
 !
 interface GigabitEthernet0/2
-  description to iosvl2-1
+  description to SW1
   no ip address
   cdp enable
   duplex full
@@ -277,10 +277,10 @@ end
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="R3" type="SIMPLE" subtype="IOSv" location="484,157">
+    <node name="R3" type="SIMPLE" subtype="IOSv" location="467,153">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:43
+            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 hostname R3
@@ -351,7 +351,7 @@ interface GigabitEthernet0/1
   no shutdown
 !
 interface GigabitEthernet0/2
-  description to iosvl2-3
+  description to SW3
   no ip address
   cdp enable
   duplex full
@@ -368,10 +368,10 @@ end
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="Internet" type="SIMPLE" subtype="IOSv" location="380,157">
+    <node name="Internet" type="SIMPLE" subtype="IOSv" location="375,153">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:43
+            <entry key="config" type="String">! IOS Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 hostname Internet
@@ -477,9 +477,9 @@ end
         <interface id="2" name="GigabitEthernet0/3"/>
         <interface id="3" name="GigabitEthernet0/4"/>
     </node>
-    <node name="iosvl2-1" type="SIMPLE" subtype="IOSvL2" location="162,163">
+    <node name="SW1" type="SIMPLE" subtype="IOSvL2" location="200,158">
         <extensions>
-            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:43
+            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 version 15.2
@@ -502,7 +502,7 @@ login
 line con 0
 password cisco
 !
-hostname iosvl2-1
+hostname SW1
 !
 boot-start-marker
 boot-end-marker
@@ -586,9 +586,9 @@ end
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
-    <node name="iosvl2-2" type="SIMPLE" subtype="IOSvL2" location="380,12">
+    <node name="SW2" type="SIMPLE" subtype="IOSvL2" location="380,28">
         <extensions>
-            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:43
+            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 version 15.2
@@ -611,7 +611,7 @@ login
 line con 0
 password cisco
 !
-hostname iosvl2-2
+hostname SW2
 !
 boot-start-marker
 boot-end-marker
@@ -695,9 +695,9 @@ end
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
-    <node name="iosvl2-3" type="SIMPLE" subtype="IOSvL2" location="561,163">
+    <node name="SW3" type="SIMPLE" subtype="IOSvL2" location="546,158">
         <extensions>
-            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:43
+            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 version 15.2
@@ -720,7 +720,7 @@ login
 line con 0
 password cisco
 !
-hostname iosvl2-3
+hostname SW3
 !
 boot-start-marker
 boot-end-marker
@@ -804,9 +804,9 @@ end
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
-    <node name="iosvl2-4" type="SIMPLE" subtype="IOSvL2" location="380,350">
+    <node name="SW4" type="SIMPLE" subtype="IOSvL2" location="380,322">
         <extensions>
-            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:43
+            <entry key="config" type="string">! IOSvL2 Config generated on 2016-04-28 16:50
 ! by autonetkit_0.21.4
 !
 version 15.2
@@ -829,7 +829,7 @@ login
 line con 0
 password cisco
 !
-hostname iosvl2-4
+hostname SW4
 !
 boot-start-marker
 boot-end-marker
