@@ -9,7 +9,7 @@
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 05:24:10 UTC Tue Apr 26 2016
+! Last configuration change at 18:28:12 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -17,22 +17,12 @@ service timestamps log datetime msec
 no platform punt-keepalive disable-kernel-core
 platform console serial
 !
-hostname DC1-MC
+hostname Router
 !
 boot-start-marker
 boot-end-marker
 !
 !
-vrf definition Mgmt-intf
- !
- address-family ipv4
- exit-address-family
- !
- address-family ipv6
- exit-address-family
-!
-enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
-enable password cisco
 !
 no aaa new-model
 !
@@ -47,12 +37,9 @@ no aaa new-model
 
 
 
-no ip domain lookup
-ip domain name virl.info
 !
 !
 !
-ipv6 unicast-routing
 !
 !
 !
@@ -70,15 +57,6 @@ multilink bundle-name authenticated
 !
 !
 !
-crypto pki trustpoint TP-self-signed-1685107286
- enrollment selfsigned
- subject-name cn=IOS-Self-Signed-Certificate-1685107286
- revocation-check none
- rsakeypair TP-self-signed-1685107286
-!
-!
-crypto pki certificate chain TP-self-signed-1685107286
- certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
 !
 !
 !
@@ -86,13 +64,11 @@ crypto pki certificate chain TP-self-signed-1685107286
 !
 !
 !
-license udi pid CSR1000V sn 9L30ONM8AXN
-license accept end user agreement
-license boot level ax
+!
+license udi pid CSR1000V sn 9VZYSPPOIKT
 !
 spanning-tree extend system-id
 !
-username cisco privilege 15 secret 5 $1$3ozY$84VMfcyUlTnCN1Oinx4Gb/
 !
 redundancy
 !
@@ -100,7 +76,6 @@ redundancy
 !
 !
 !
-cdp run
 !
 ! 
 !
@@ -122,32 +97,23 @@ cdp run
 ! 
 ! 
 !
-!
-interface Loopback0
- description Loopback
- no ip address
 !
 interface GigabitEthernet1
- description OOB Management
- vrf forwarding Mgmt-intf
- ip address 10.255.0.50 255.255.0.0
+ no ip address
+ shutdown
  negotiation auto
- cdp enable
 !
 interface GigabitEthernet2
- description to DC1-WVSS
  no ip address
+ shutdown
  negotiation auto
- cdp enable
 !
 !
-virtual-service csr_mgmt
 !
 ip forward-protocol nd
 !
 no ip http server
-ip http secure-server
-ip ssh server algorithm authentication password
+no ip http secure-server
 !
 !
 !
@@ -165,13 +131,14 @@ control-plane
 !
 !
 line con 0
- password cisco
  stopbits 1
-line vty 0 4
- exec-timeout 720 0
- password cisco
- login local
- transport input telnet ssh
+line vty 0
+ login
+line vty 1
+ login
+ length 0
+line vty 2 4
+ login
 !
 !
 end</entry>
@@ -348,7 +315,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="Boolean"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:38:23 UTC Tue Apr 26 2016
+! Last configuration change at 18:12:56 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -427,7 +394,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.76 255.255.0.0
+ ip address 10.255.0.195 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -506,7 +473,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:37:51 UTC Tue Apr 26 2016
+! Last configuration change at 18:12:20 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -585,7 +552,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.69 255.255.0.0
+ ip address 10.255.0.188 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -1047,7 +1014,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 05:19:35 UTC Tue Apr 26 2016
+! Last configuration change at 18:24:54 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1108,6 +1075,12 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1606814735
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1606814735
+ revocation-check none
+ rsakeypair TP-self-signed-1606814735
+!
 crypto pki trustpoint TP-self-signed-2892195105
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-2892195105
@@ -1115,8 +1088,9 @@ crypto pki trustpoint TP-self-signed-2892195105
  rsakeypair TP-self-signed-2892195105
 !
 !
-crypto pki certificate chain TP-self-signed-2892195105
+crypto pki certificate chain TP-self-signed-1606814735
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-2892195105
 !
 !
 !
@@ -1124,7 +1098,7 @@ crypto pki certificate chain TP-self-signed-2892195105
 !
 !
 !
-license udi pid CSR1000V sn 91H4O6KRRGR
+license udi pid CSR1000V sn 90B02DAEKX5
 license accept end user agreement
 license boot level ax
 !
@@ -1168,7 +1142,7 @@ interface Loopback0
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.64 255.255.0.0
+ ip address 10.255.0.183 255.255.0.0
  negotiation auto
  cdp enable
 !
@@ -1435,7 +1409,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 05:23:05 UTC Tue Apr 26 2016
+! Last configuration change at 18:26:57 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1496,6 +1470,12 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-2602237292
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2602237292
+ revocation-check none
+ rsakeypair TP-self-signed-2602237292
+!
 crypto pki trustpoint TP-self-signed-1717490606
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-1717490606
@@ -1503,8 +1483,9 @@ crypto pki trustpoint TP-self-signed-1717490606
  rsakeypair TP-self-signed-1717490606
 !
 !
-crypto pki certificate chain TP-self-signed-1717490606
+crypto pki certificate chain TP-self-signed-2602237292
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-1717490606
 !
 !
 !
@@ -1512,7 +1493,7 @@ crypto pki certificate chain TP-self-signed-1717490606
 !
 !
 !
-license udi pid CSR1000V sn 9X4QNN8XBW5
+license udi pid CSR1000V sn 9JCJ01BN5M0
 license accept end user agreement
 license boot level ax
 !
@@ -1556,7 +1537,7 @@ interface Loopback0
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.75 255.255.0.0
+ ip address 10.255.0.194 255.255.0.0
  negotiation auto
  cdp enable
 !
@@ -1628,105 +1609,160 @@ end</entry>
     <node name="DC1-01" type="SIMPLE" subtype="CSR1000v" location="491,62" ipv4="192.168.0.18">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-26 04:30
-! by autonetkit_0.21.4
+            <entry key="config" type="String">!
+! Last configuration change at 18:27:42 UTC Thu Apr 28 2016
 !
-hostname DC1-01
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname Router
+!
 boot-start-marker
 boot-end-marker
 !
-vrf definition Mgmt-intf
-!
- address-family ipv4
- exit-address-family
- !
- address-family ipv6
- exit-address-family
-!
-!
-!
-license accept end user agreement
-license boot level premium
 !
 !
 no aaa new-model
 !
 !
-ipv6 unicast-routing
 !
 !
-service timestamps debug datetime msec
-service timestamps log datetime msec
-no service password-encryption
-no service config
-enable password cisco
-enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
-ip classless
-ip subnet-zero
-no ip domain lookup
-ip domain name virl.info
-crypto key generate rsa modulus 768
-ip ssh server algorithm authentication password
-username cisco privilege 15 secret cisco
-line vty 0 4
- transport input ssh telnet
- exec-timeout 720 0
- password cisco
- login local
-line con 0
- password cisco
-!
-cdp run
 !
 !
-interface Loopback0
-  description Loopback
-  no ip address
+!
+!
+!
+
+
+
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9T3Q83NK13W
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
 !
 interface GigabitEthernet1
-  description OOB Management
-  vrf forwarding Mgmt-intf
-  ! Configured on launch
-  no ip address
-  cdp enable
-  no shutdown
+ no ip address
+ shutdown
+ negotiation auto
 !
 interface GigabitEthernet2
-  description to DC1-DR1
-  no ip address
-  cdp enable
-  no shutdown
+ no ip address
+ shutdown
+ negotiation auto
 !
 interface GigabitEthernet3
-  description to DC1-DR2
-  no ip address
-  cdp enable
-  no shutdown
+ no ip address
+ shutdown
+ negotiation auto
 !
 interface GigabitEthernet4
-  description to MPLS1
-  no ip address
-  cdp enable
-  no shutdown
+ no ip address
+ shutdown
+ negotiation auto
 !
 interface GigabitEthernet5
-  description to MPLS2
-  no ip address
-  cdp enable
-  no shutdown
+ no ip address
+ shutdown
+ negotiation auto
 !
 interface GigabitEthernet6
-  description to MPLS3
-  no ip address
-  cdp enable
-  no shutdown
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
 !
 !
 !
 !
 !
-end
-</entry>
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0
+ login
+line vty 1
+ login
+ length 0
+line vty 2 4
+ login
+!
+!
+end</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet2"/>
         <interface id="1" name="GigabitEthernet3"/>
@@ -1738,7 +1774,7 @@ end
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 05:23:35 UTC Tue Apr 26 2016
+! Last configuration change at 18:27:43 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1799,6 +1835,12 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1570593715
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1570593715
+ revocation-check none
+ rsakeypair TP-self-signed-1570593715
+!
 crypto pki trustpoint TP-self-signed-4194046029
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-4194046029
@@ -1806,8 +1848,9 @@ crypto pki trustpoint TP-self-signed-4194046029
  rsakeypair TP-self-signed-4194046029
 !
 !
-crypto pki certificate chain TP-self-signed-4194046029
+crypto pki certificate chain TP-self-signed-1570593715
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-4194046029
 !
 !
 !
@@ -1815,7 +1858,7 @@ crypto pki certificate chain TP-self-signed-4194046029
 !
 !
 !
-license udi pid CSR1000V sn 9R4I6XO7I8B
+license udi pid CSR1000V sn 9J275JFW6MS
 license accept end user agreement
 license boot level ax
 !
@@ -1859,7 +1902,7 @@ interface Loopback0
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.48 255.255.0.0
+ ip address 10.255.0.167 255.255.0.0
  negotiation auto
  cdp enable
 !
@@ -2133,7 +2176,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 05:58:24 UTC Tue Apr 26 2016
+! Last configuration change at 18:27:48 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2194,6 +2237,12 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1964300309
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1964300309
+ revocation-check none
+ rsakeypair TP-self-signed-1964300309
+!
 crypto pki trustpoint TP-self-signed-184670981
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-184670981
@@ -2201,8 +2250,9 @@ crypto pki trustpoint TP-self-signed-184670981
  rsakeypair TP-self-signed-184670981
 !
 !
-crypto pki certificate chain TP-self-signed-184670981
+crypto pki certificate chain TP-self-signed-1964300309
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-184670981
 !
 !
 !
@@ -2210,7 +2260,7 @@ crypto pki certificate chain TP-self-signed-184670981
 !
 !
 !
-license udi pid CSR1000V sn 92RCAOBIRN3
+license udi pid CSR1000V sn 9VHN23CFVAU
 license accept end user agreement
 license boot level ax
 !
@@ -2254,7 +2304,7 @@ interface Loopback0
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.73 255.255.0.0
+ ip address 10.255.0.192 255.255.0.0
  negotiation auto
  cdp enable
 !
@@ -2281,6 +2331,9 @@ interface GigabitEthernet5
  no ip address
  negotiation auto
  cdp enable
+!
+!
+virtual-service csr_mgmt
 !
 ip forward-protocol nd
 !
@@ -2324,7 +2377,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:37:08 UTC Tue Apr 26 2016
+! Last configuration change at 18:11:51 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2403,7 +2456,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.63 255.255.0.0
+ ip address 10.255.0.182 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -2838,7 +2891,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:37:25 UTC Tue Apr 26 2016
+! Last configuration change at 18:11:57 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2917,7 +2970,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.65 255.255.0.0
+ ip address 10.255.0.184 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -3187,7 +3240,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:38:08 UTC Tue Apr 26 2016
+! Last configuration change at 18:12:33 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -3266,7 +3319,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.72 255.255.0.0
+ ip address 10.255.0.191 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -3661,7 +3714,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:34:21 UTC Tue Apr 26 2016
+! Last configuration change at 18:09:19 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -3740,7 +3793,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.55 255.255.0.0
+ ip address 10.255.0.174 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -3819,7 +3872,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:36:03 UTC Tue Apr 26 2016
+! Last configuration change at 18:10:25 UTC Thu Apr 28 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -3898,7 +3951,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.59 255.255.0.0
+ ip address 10.255.0.178 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -4150,81 +4203,173 @@ end</entry>
     <node name="DC2-MC" type="SIMPLE" subtype="CSR1000v" location="792,388" ipv4="192.168.0.7">
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="String"></entry>
-            <entry key="config" type="String">! IOS Config generated on 2016-04-26 04:30
-! by autonetkit_0.21.4
+            <entry key="config" type="String">!
+! Last configuration change at 18:28:52 UTC Thu Apr 28 2016
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
 !
 hostname DC2-MC
+!
 boot-start-marker
 boot-end-marker
 !
-vrf definition Mgmt-intf
 !
+vrf definition Mgmt-intf
+ !
  address-family ipv4
  exit-address-family
  !
  address-family ipv6
  exit-address-family
 !
-!
-!
-license accept end user agreement
-license boot level premium
-!
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+enable password cisco
 !
 no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+
+no ip domain lookup
+ip domain name virl.info
+!
 !
 !
 ipv6 unicast-routing
 !
 !
-service timestamps debug datetime msec
-service timestamps log datetime msec
-no service password-encryption
-no service config
-enable password cisco
-enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
-ip classless
-ip subnet-zero
-no ip domain lookup
-ip domain name virl.info
-crypto key generate rsa modulus 768
-ip ssh server algorithm authentication password
-username cisco privilege 15 secret cisco
-line vty 0 4
- transport input ssh telnet
- exec-timeout 720 0
- password cisco
- login local
-line con 0
- password cisco
+!
+!
+!
+!
+!
+subscriber templating
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-1208887588
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1208887588
+ revocation-check none
+ rsakeypair TP-self-signed-1208887588
+!
+!
+crypto pki certificate chain TP-self-signed-1208887588
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9NSD26FKUAF
+license accept end user agreement
+license boot level ax
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$zPAB$GSMZX2ivUpX.AJ.8bLTuC0
+!
+redundancy
+!
+!
+!
+!
 !
 cdp run
 !
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
 !
 interface Loopback0
-  description Loopback
-  no ip address
+ description Loopback
+ no ip address
 !
 interface GigabitEthernet1
-  description OOB Management
-  vrf forwarding Mgmt-intf
-  ! Configured on launch
-  no ip address
-  cdp enable
-  no shutdown
+ description OOB Management
+ vrf forwarding Mgmt-intf
+ ip address 10.255.0.175 255.255.0.0
+ negotiation auto
+ cdp enable
 !
 interface GigabitEthernet2
-  description to DC2-WVSS
-  no ip address
-  cdp enable
-  no shutdown
+ description to DC2-WVSS
+ no ip address
+ negotiation auto
+ cdp enable
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+ip ssh server algorithm authentication password
 !
 !
 !
 !
 !
-end
-</entry>
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ password cisco
+ stopbits 1
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login local
+ transport input telnet ssh
+!
+!
+end</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet2"/>
     </node>
@@ -4390,7 +4535,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 04:33:44 UTC Tue Apr 26 2016
+! Last configuration change at 18:09:01 UTC Thu Apr 28 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -4469,7 +4614,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 10.255.0.57 255.255.0.0
+ ip address 10.255.0.176 255.255.0.0
  negotiation auto
 !
 ip forward-protocol nd
