@@ -8,7 +8,7 @@
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 21:24:12 UTC Sat May 7 2016 by cisco
+! Last configuration change at 01:03:31 UTC Sun May 8 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -72,9 +72,27 @@ no cdp run
 !
 !
 !
+crypto ikev2 keyring OUR-KEY-RING
+ peer R5-HQ-ROuter
+  address 45.0.0.5
+  identity fqdn R5.virl.com
+  pre-shared-key local cisco-XYZ
+  pre-shared-key remote cisco-ABC
+ !
+!
+!
+crypto ikev2 profile OUR-PROFILE
+ match identity remote fqdn R5.virl.com
+ identity local fqdn R6.virl.com
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local OUR-KEY-RING
 !
 !
 !
+!
+crypto ipsec profile default
+ set ikev2-profile OUR-PROFILE
 !
 !
 !
@@ -83,12 +101,23 @@ no cdp run
 !
 interface Loopback0
  description Loopback
- no ip address
+ ip address 6.6.6.6 255.255.255.255
+!
+interface Tunnel3
+ description 45.0.0.5
+ ip unnumbered Loopback0
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+ ip ospf 1 area 0
+ tunnel source GigabitEthernet0/1
+ tunnel mode ipsec ipv4
+ tunnel destination 45.0.0.5
+ tunnel protection ipsec profile default
 !
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.114 255.255.0.0
+ ip address 10.255.0.120 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -110,12 +139,16 @@ interface GigabitEthernet0/2
  media-type rj45
  no cdp enable
 !
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+!
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 46.0.0.10
+ip route 10.5.5.0 255.255.255.0 Tunnel3 200
 ip ssh server algorithm authentication password
 !
 !
@@ -171,7 +204,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 21:17:52 UTC Sat May 7 2016 by cisco
+! Last configuration change at 00:21:47 UTC Sun May 8 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -250,7 +283,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.118 255.255.0.0
+ ip address 10.255.0.124 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -346,7 +379,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 19:40:48 UTC Sat May 7 2016
+! Last configuration change at 00:21:07 UTC Sun May 8 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -423,7 +456,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 10.255.0.115 255.255.0.0
+ ip address 10.255.0.121 255.255.0.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -484,7 +517,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 21:21:25 UTC Sat May 7 2016 by cisco
+! Last configuration change at 01:04:02 UTC Sun May 8 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -547,9 +580,27 @@ redundancy
 !
 !
 !
+crypto ikev2 keyring OUR-KEY-RING
+ peer R6-Branch-Router
+  address 46.0.0.6
+  identity fqdn R6.virl.com
+  pre-shared-key local cisco-ABC
+  pre-shared-key remote cisco-XYZ
+ !
+!
+!
+crypto ikev2 profile OUR-PROFILE
+ match identity remote fqdn R6.virl.com
+ identity local fqdn R5.virl.com
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local OUR-KEY-RING
 !
 !
 !
+!
+crypto ipsec profile default
+ set ikev2-profile OUR-PROFILE
 !
 !
 !
@@ -558,12 +609,22 @@ redundancy
 !
 interface Loopback0
  description Loopback
- no ip address
+ ip address 5.5.5.5 255.255.255.0
+!
+interface Tunnel3
+ ip unnumbered Loopback0
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+ ip ospf 1 area 0
+ tunnel source GigabitEthernet0/1
+ tunnel mode ipsec ipv4
+ tunnel destination 46.0.0.6
+ tunnel protection ipsec profile default
 !
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 10.255.0.113 255.255.0.0
+ ip address 10.255.0.119 255.255.0.0
  duplex full
  speed auto
  media-type rj45
@@ -584,12 +645,16 @@ interface GigabitEthernet0/2
  media-type rj45
  no cdp enable
 !
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+!
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 45.0.0.10
+ip route 10.6.6.0 255.255.255.0 Tunnel3 200
 ip ssh server algorithm authentication password
 !
 !
@@ -645,7 +710,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 19:40:52 UTC Sat May 7 2016
+! Last configuration change at 00:21:13 UTC Sun May 8 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -722,7 +787,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 10.255.0.116 255.255.0.0
+ ip address 10.255.0.122 255.255.0.0
  negotiation auto
 !
 ip forward-protocol nd
