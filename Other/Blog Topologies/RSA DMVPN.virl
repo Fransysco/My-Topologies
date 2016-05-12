@@ -10,7 +10,7 @@
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 17:50:03 UTC Thu May 12 2016 by cisco
+! Last configuration change at 20:36:06 UTC Thu May 12 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -79,6 +79,7 @@ redundancy
 !
 !
 !
+crypto ipsec security-association replay window-size 512
 !
 !
 !
@@ -90,6 +91,24 @@ redundancy
 interface Loopback0
  description Loopback
  ip address 10.100.0.1 255.255.255.255
+!
+interface Tunnel1
+ ip address 172.16.1.11 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication cisco
+ ip nhrp group shape5mb
+ ip nhrp network-id 10
+ ip nhrp holdtime 600
+ ip nhrp nhs 172.16.1.1 nbma 7.7.7.2 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ shutdown
+ if-state nhrp
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel vrf DMVPN1
 !
 interface GigabitEthernet0/0
  description OOB Management
@@ -726,7 +745,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 18:45:22 UTC Thu May 12 2016 by cisco
+! Last configuration change at 21:06:26 UTC Thu May 12 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -820,19 +839,6 @@ redundancy
 !
 !
 !
-crypto ikev2 keyring DMVPN-KEYRING-1
- peer ANY
-  address 0.0.0.0 0.0.0.0
-  pre-shared-key c1sco123
- !
-!
-!
-crypto ikev2 profile DMVPN1
- match identity remote address 0.0.0.0 
- authentication local pre-share
- authentication remote pre-share
- keyring local DMVPN-KEYRING-1
-!
 !
 !
 cdp run
@@ -845,12 +851,6 @@ cdp run
 !
 crypto ipsec security-association replay window-size 512
 !
-crypto ipsec transform-set AES256/SHA/TRANSPORT esp-aes 256 esp-sha-hmac 
- mode transport
-!
-crypto ipsec profile DMVPN1
- set transform-set AES256/SHA/TRANSPORT 
- set ikev2-profile DMVPN1
 !
 !
 !
@@ -867,11 +867,23 @@ crypto ipsec profile DMVPN1
 !
 interface Loopback0
  description Loopback
- no ip address
+ vrf forwarding DMVPN1
+ ip address 10.0.100.1 255.255.255.255
 !
 interface Tunnel1
- no ip address
- tunnel protection ipsec profile DMVPN1
+ ip address 172.16.1.1 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication cisco
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 10
+ ip nhrp holdtime 600
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel vrf DMVPN1
 !
 interface GigabitEthernet1
  description OOB Management
@@ -2268,7 +2280,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 17:30:22 UTC Thu May 12 2016 by cisco
+! Last configuration change at 19:20:40 UTC Thu May 12 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2393,6 +2405,7 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
+ip route 10.0.100.1 255.255.255.255 7.7.7.2
 ip ssh server algorithm authentication password
 !
 !
