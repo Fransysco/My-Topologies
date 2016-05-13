@@ -10,7 +10,7 @@
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 02:28:25 UTC Fri May 13 2016 by cisco
+! Last configuration change at 16:41:11 UTC Fri May 13 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -56,6 +56,10 @@ mmi snmp-timeout 180
 !
 !
 !
+ip dhcp pool network
+ network 10.100.1.0 255.255.255.0
+ default-router 10.100.1.1 
+!
 !
 !
 no ip domain lookup
@@ -78,9 +82,30 @@ redundancy
 !
 !
 !
+crypto ikev2 keyring DMVPN-KEYRING
+ peer ANY
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key c1sco123
+ !
+!
+!
+crypto ikev2 profile FVRF-IKEv2
+ match fvrf any
+ match identity remote address 0.0.0.0 
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local DMVPN-KEYRING
+ dpd 40 5 on-demand
+!
 !
 crypto ipsec security-association replay window-size 512
 !
+crypto ipsec transform-set AES256/SHA/TRANSPORT esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN
+ set transform-set AES256/SHA/TRANSPORT 
+ set ikev2-profile FVRF-IKEv2
 !
 !
 !
@@ -107,11 +132,12 @@ interface Tunnel1
  tunnel mode gre multipoint
  tunnel key 10
  tunnel vrf DMVPN1
+ tunnel protection ipsec profile DMVPN
 !
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.163 255.255.255.0
+ ip address 172.16.1.178 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -199,7 +225,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 02:40:16 UTC Fri May 13 2016 by cisco
+! Last configuration change at 14:41:02 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -267,8 +293,30 @@ redundancy
 !
 !
 !
+crypto ikev2 keyring DMVPN-KEYRING
+ peer ANY
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key c1sco123
+ !
 !
 !
+crypto ikev2 profile FVRF-IKEv2
+ match fvrf any
+ match identity remote address 0.0.0.0 
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local DMVPN-KEYRING
+ dpd 40 5 on-demand
+!
+!
+crypto ipsec security-association replay window-size 512
+!
+crypto ipsec transform-set AES256/SHA/TRANSPORT esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN
+ set transform-set AES256/SHA/TRANSPORT 
+ set ikev2-profile FVRF-IKEv2
 !
 !
 !
@@ -295,11 +343,12 @@ interface Tunnel2
  tunnel mode gre multipoint
  tunnel key 20
  tunnel vrf DMVPN2
+ tunnel protection ipsec profile DMVPN
 !
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.164 255.255.255.0
+ ip address 172.16.1.179 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -386,7 +435,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:51:23 UTC Fri May 13 2016
+! Last configuration change at 15:38:15 UTC Fri May 13 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -398,6 +447,16 @@ hostname Branch2-R1
 boot-start-marker
 boot-end-marker
 !
+!
+vrf definition DMVPN1
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition DMVPN2
+ !
+ address-family ipv4
+ exit-address-family
 !
 vrf definition Mgmt-intf
  !
@@ -449,8 +508,30 @@ redundancy
 !
 !
 !
+crypto ikev2 keyring DMVPN-KEYRING
+ peer ANY
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key c1sco123
+ !
 !
 !
+crypto ikev2 profile FVRF-IKEv2
+ match fvrf any
+ match identity remote address 0.0.0.0 
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local DMVPN-KEYRING
+ dpd 40 5 on-demand
+!
+!
+crypto ipsec security-association replay window-size 512
+!
+crypto ipsec transform-set AES256/SHA/TRANSPORT esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN
+ set transform-set AES256/SHA/TRANSPORT 
+ set ikev2-profile FVRF-IKEv2
 !
 !
 !
@@ -462,24 +543,61 @@ interface Loopback0
  description Loopback
  no ip address
 !
+interface Tunnel1
+ ip address 172.16.1.12 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication cisco
+ ip nhrp network-id 10
+ ip nhrp holdtime 600
+ ip nhrp nhs 172.16.1.1 nbma 10.0.100.1 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ if-state nhrp
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel vrf DMVPN1
+ tunnel protection ipsec profile DMVPN
+!
+interface Tunnel2
+ ip address 172.16.2.12 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication cisco
+ ip nhrp network-id 20
+ ip nhrp holdtime 600
+ ip nhrp nhs 172.16.2.1 nbma 10.0.200.1 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ if-state nhrp
+ tunnel source GigabitEthernet0/2
+ tunnel mode gre multipoint
+ tunnel key 20
+ tunnel vrf DMVPN2
+ tunnel protection ipsec profile DMVPN
+!
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.157 255.255.255.0
+ ip address 172.16.1.172 255.255.255.0
  duplex full
  speed auto
  media-type rj45
+ no cdp enable
 !
 interface GigabitEthernet0/1
  description to ISP1
- no ip address
+ vrf forwarding DMVPN1
+ ip address 7.7.7.10 255.255.255.252
  duplex full
  speed auto
  media-type rj45
 !
 interface GigabitEthernet0/2
  description to ISP2
- no ip address
+ vrf forwarding DMVPN2
+ ip address 8.8.8.10 255.255.255.252
  duplex full
  speed auto
  media-type rj45
@@ -490,12 +608,15 @@ interface GigabitEthernet0/3
  duplex full
  speed auto
  media-type rj45
+ no cdp enable
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
+ip route vrf DMVPN1 0.0.0.0 0.0.0.0 7.7.7.9
+ip route vrf DMVPN2 0.0.0.0 0.0.0.0 8.8.8.9
 ip ssh server algorithm authentication password
 !
 !
@@ -552,7 +673,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 02:47:02 UTC Fri May 13 2016 by cisco
+! Last configuration change at 14:44:10 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -618,6 +739,12 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1298940484
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1298940484
+ revocation-check none
+ rsakeypair TP-self-signed-1298940484
+!
 crypto pki trustpoint TP-self-signed-827676173
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-827676173
@@ -631,8 +758,9 @@ crypto pki trustpoint TP-self-signed-3589596084
  rsakeypair TP-self-signed-3589596084
 !
 !
-crypto pki certificate chain TP-self-signed-827676173
+crypto pki certificate chain TP-self-signed-1298940484
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-827676173
 crypto pki certificate chain TP-self-signed-3589596084
 !
 !
@@ -641,7 +769,7 @@ crypto pki certificate chain TP-self-signed-3589596084
 !
 !
 !
-license udi pid CSR1000V sn 9DDERWUGRQG
+license udi pid CSR1000V sn 99BGF9G7NG2
 license accept end user agreement
 license boot level ax
 !
@@ -653,6 +781,20 @@ redundancy
 !
 !
 !
+crypto ikev2 keyring DMVPN-KEYRING
+ peer ANY
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key c1sco123
+ !
+!
+!
+crypto ikev2 profile FVRF-IKEv2
+ match fvrf DMVPN2
+ match identity remote address 0.0.0.0 
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local DMVPN-KEYRING
+!
 !
 !
 cdp run
@@ -663,7 +805,14 @@ cdp run
 !
 !
 !
+crypto ipsec security-association replay window-size 512
 !
+crypto ipsec transform-set AES256/SHA/TRANSPORT esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN
+ set transform-set AES256/SHA/TRANSPORT 
+ set ikev2-profile FVRF-IKEv2
 !
 !
 !
@@ -697,11 +846,12 @@ interface Tunnel2
  tunnel mode gre multipoint
  tunnel key 20
  tunnel vrf DMVPN2
+ tunnel protection ipsec profile DMVPN
 !
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.167 255.255.255.0
+ ip address 172.16.1.182 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet2
@@ -782,7 +932,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:55:39 UTC Fri May 13 2016
+! Last configuration change at 14:44:24 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -848,6 +998,12 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1783107452
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1783107452
+ revocation-check none
+ rsakeypair TP-self-signed-1783107452
+!
 crypto pki trustpoint TP-self-signed-1692709661
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-1692709661
@@ -861,8 +1017,9 @@ crypto pki trustpoint TP-self-signed-2633728531
  rsakeypair TP-self-signed-2633728531
 !
 !
-crypto pki certificate chain TP-self-signed-1692709661
+crypto pki certificate chain TP-self-signed-1783107452
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-1692709661
 crypto pki certificate chain TP-self-signed-2633728531
 !
 !
@@ -871,7 +1028,7 @@ crypto pki certificate chain TP-self-signed-2633728531
 !
 !
 !
-license udi pid CSR1000V sn 9EFH60JQBWR
+license udi pid CSR1000V sn 9MN8KBZR9EB
 license accept end user agreement
 license boot level ax
 !
@@ -882,6 +1039,20 @@ username cisco privilege 15 secret 5 $1$N280$xDgzJMTWVhn39Iz22tw7/1
 redundancy
 !
 !
+!
+crypto ikev2 keyring DMVPN-KEYRING
+ peer ANY
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key c1sco123
+ !
+!
+!
+crypto ikev2 profile FVRF-IKEv2
+ match fvrf DMVPN1
+ match identity remote address 0.0.0.0 
+ authentication local pre-share
+ authentication remote pre-share
+ keyring local DMVPN-KEYRING
 !
 !
 !
@@ -895,6 +1066,12 @@ cdp run
 !
 crypto ipsec security-association replay window-size 512
 !
+crypto ipsec transform-set AES256/SHA/TRANSPORT esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN
+ set transform-set AES256/SHA/TRANSPORT 
+ set ikev2-profile FVRF-IKEv2
 !
 !
 !
@@ -928,11 +1105,12 @@ interface Tunnel1
  tunnel mode gre multipoint
  tunnel key 10
  tunnel vrf DMVPN1
+ tunnel protection ipsec profile DMVPN
 !
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.170 255.255.255.0
+ ip address 172.16.1.185 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet2
@@ -1013,7 +1191,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:51:22 UTC Fri May 13 2016
+! Last configuration change at 16:47:07 UTC Fri May 13 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1104,7 +1282,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 172.16.1.158 255.255.255.0
+ ip address 172.16.1.173 255.255.255.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -1167,7 +1345,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:50:52 UTC Fri May 13 2016
+! Last configuration change at 14:39:31 UTC Fri May 13 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1251,7 +1429,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 172.16.1.156 255.255.255.0
+ ip address 172.16.1.171 255.255.255.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -1313,7 +1491,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:52:06 UTC Fri May 13 2016
+! Last configuration change at 14:40:44 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1392,7 +1570,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.160 255.255.255.0
+ ip address 172.16.1.175 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -1500,7 +1678,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:52:06 UTC Fri May 13 2016
+! Last configuration change at 14:40:41 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1579,7 +1757,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.159 255.255.255.0
+ ip address 172.16.1.174 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -1696,7 +1874,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 01:53:05 UTC Fri May 13 2016
+! Last configuration change at 14:41:41 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1775,7 +1953,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.169 255.255.255.0
+ ip address 172.16.1.184 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -2059,7 +2237,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 02:42:52 UTC Fri May 13 2016 by cisco
+! Last configuration change at 14:41:20 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2138,7 +2316,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.165 255.255.255.0
+ ip address 172.16.1.180 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -2325,7 +2503,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 01:52:59 UTC Fri May 13 2016
+! Last configuration change at 14:41:33 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2404,7 +2582,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.166 255.255.255.0
+ ip address 172.16.1.181 255.255.255.0
  duplex full
  speed auto
  media-type rj45
