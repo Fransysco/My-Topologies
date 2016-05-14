@@ -10,7 +10,7 @@
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 16:41:11 UTC Fri May 13 2016 by cisco
+! Last configuration change at 00:36:30 UTC Sat May 14 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -126,6 +126,7 @@ interface Tunnel1
  ip nhrp holdtime 600
  ip nhrp nhs 172.16.1.1 nbma 10.0.100.1 multicast
  ip nhrp shortcut
+ ip summary-address eigrp 777 10.100.0.0 255.255.0.0
  ip tcp adjust-mss 1360
  if-state nhrp
  tunnel source GigabitEthernet0/1
@@ -137,7 +138,7 @@ interface Tunnel1
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.178 255.255.255.0
+ ip address 172.16.1.208 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -163,6 +164,12 @@ interface GigabitEthernet0/2
  speed auto
  media-type rj45
  no cdp enable
+!
+!
+router eigrp 777
+ network 10.0.0.0
+ network 172.16.0.0
+ eigrp stub connected summary
 !
 ip forward-protocol nd
 !
@@ -225,7 +232,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:41:02 UTC Fri May 13 2016
+! Last configuration change at 00:38:05 UTC Sat May 14 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -337,6 +344,7 @@ interface Tunnel2
  ip nhrp holdtime 600
  ip nhrp nhs 172.16.2.1 nbma 10.0.200.1 multicast
  ip nhrp shortcut
+ ip summary-address eigrp 777 10.100.0.0 255.255.0.0
  ip tcp adjust-mss 1360
  if-state nhrp
  tunnel source GigabitEthernet0/1
@@ -348,7 +356,7 @@ interface Tunnel2
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.179 255.255.255.0
+ ip address 172.16.1.209 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -373,6 +381,12 @@ interface GigabitEthernet0/2
  speed auto
  media-type rj45
  no cdp enable
+!
+!
+router eigrp 777
+ network 10.0.0.0
+ network 172.16.0.0
+ eigrp stub connected summary
 !
 ip forward-protocol nd
 !
@@ -435,7 +449,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 15:38:15 UTC Fri May 13 2016 by cisco
+! Last configuration change at 23:34:12 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -580,7 +594,7 @@ interface Tunnel2
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.172 255.255.255.0
+ ip address 172.16.1.202 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -673,7 +687,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:44:10 UTC Fri May 13 2016
+! Last configuration change at 00:48:16 UTC Sat May 14 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -739,6 +753,18 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-3538386258
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3538386258
+ revocation-check none
+ rsakeypair TP-self-signed-3538386258
+!
+crypto pki trustpoint TP-self-signed-1876577649
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1876577649
+ revocation-check none
+ rsakeypair TP-self-signed-1876577649
+!
 crypto pki trustpoint TP-self-signed-1298940484
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-1298940484
@@ -758,8 +784,10 @@ crypto pki trustpoint TP-self-signed-3589596084
  rsakeypair TP-self-signed-3589596084
 !
 !
-crypto pki certificate chain TP-self-signed-1298940484
+crypto pki certificate chain TP-self-signed-3538386258
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-1876577649
+crypto pki certificate chain TP-self-signed-1298940484
 crypto pki certificate chain TP-self-signed-827676173
 crypto pki certificate chain TP-self-signed-3589596084
 !
@@ -769,7 +797,7 @@ crypto pki certificate chain TP-self-signed-3589596084
 !
 !
 !
-license udi pid CSR1000V sn 99BGF9G7NG2
+license udi pid CSR1000V sn 9JUKGP44NJ8
 license accept end user agreement
 license boot level ax
 !
@@ -841,6 +869,7 @@ interface Tunnel2
  ip nhrp network-id 20
  ip nhrp holdtime 600
  ip nhrp redirect
+ ip summary-address eigrp 777 10.0.0.0 255.0.0.0
  ip tcp adjust-mss 1360
  tunnel source Loopback0
  tunnel mode gre multipoint
@@ -851,7 +880,7 @@ interface Tunnel2
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.182 255.255.255.0
+ ip address 172.16.1.212 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet2
@@ -882,9 +911,11 @@ interface GigabitEthernet5
 !
 router eigrp 777
  network 10.0.0.0
+ network 172.16.0.0
  passive-interface default
  no passive-interface GigabitEthernet3
  no passive-interface GigabitEthernet5
+ no passive-interface Tunnel2
 !
 !
 virtual-service csr_mgmt
@@ -932,7 +963,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:44:24 UTC Fri May 13 2016
+! Last configuration change at 00:46:37 UTC Sat May 14 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -998,6 +1029,18 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1071537903
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1071537903
+ revocation-check none
+ rsakeypair TP-self-signed-1071537903
+!
+crypto pki trustpoint TP-self-signed-4274187096
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-4274187096
+ revocation-check none
+ rsakeypair TP-self-signed-4274187096
+!
 crypto pki trustpoint TP-self-signed-1783107452
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-1783107452
@@ -1017,8 +1060,10 @@ crypto pki trustpoint TP-self-signed-2633728531
  rsakeypair TP-self-signed-2633728531
 !
 !
-crypto pki certificate chain TP-self-signed-1783107452
+crypto pki certificate chain TP-self-signed-1071537903
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-4274187096
+crypto pki certificate chain TP-self-signed-1783107452
 crypto pki certificate chain TP-self-signed-1692709661
 crypto pki certificate chain TP-self-signed-2633728531
 !
@@ -1028,7 +1073,7 @@ crypto pki certificate chain TP-self-signed-2633728531
 !
 !
 !
-license udi pid CSR1000V sn 9MN8KBZR9EB
+license udi pid CSR1000V sn 9SKWWUPPZIQ
 license accept end user agreement
 license boot level ax
 !
@@ -1100,6 +1145,7 @@ interface Tunnel1
  ip nhrp network-id 10
  ip nhrp holdtime 600
  ip nhrp redirect
+ ip summary-address eigrp 777 10.0.0.0 255.0.0.0
  ip tcp adjust-mss 1360
  tunnel source Loopback0
  tunnel mode gre multipoint
@@ -1110,7 +1156,7 @@ interface Tunnel1
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.185 255.255.255.0
+ ip address 172.16.1.215 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet2
@@ -1141,9 +1187,11 @@ interface GigabitEthernet5
 !
 router eigrp 777
  network 10.0.0.0
+ network 172.16.0.0
  passive-interface default
  no passive-interface GigabitEthernet3
  no passive-interface GigabitEthernet5
+ no passive-interface Tunnel1
 !
 !
 virtual-service csr_mgmt
@@ -1191,7 +1239,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 16:47:07 UTC Fri May 13 2016
+! Last configuration change at 23:34:08 UTC Fri May 13 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1282,7 +1330,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 172.16.1.173 255.255.255.0
+ ip address 172.16.1.203 255.255.255.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -1345,7 +1393,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:39:31 UTC Fri May 13 2016
+! Last configuration change at 23:33:40 UTC Fri May 13 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1429,7 +1477,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 172.16.1.171 255.255.255.0
+ ip address 172.16.1.201 255.255.255.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -1491,7 +1539,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:40:44 UTC Fri May 13 2016
+! Last configuration change at 00:03:57 UTC Sat May 14 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1570,7 +1618,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.175 255.255.255.0
+ ip address 172.16.1.205 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -1678,7 +1726,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:40:41 UTC Fri May 13 2016
+! Last configuration change at 23:34:51 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1757,7 +1805,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.174 255.255.255.0
+ ip address 172.16.1.204 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -1874,7 +1922,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 14:41:41 UTC Fri May 13 2016
+! Last configuration change at 00:07:18 UTC Sat May 14 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1953,17 +2001,22 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.184 255.255.255.0
+ ip address 172.16.1.214 255.255.255.0
+ duplex full
+ speed auto
+ media-type rj45
+ no cdp enable
+!
+interface GigabitEthernet0/1
+ description to Core1
+ ip address 10.0.0.6 255.255.255.252
  duplex full
  speed auto
  media-type rj45
 !
-interface GigabitEthernet0/1
- description to Core1
- no ip address
- duplex full
- speed auto
- media-type rj45
+!
+router eigrp 777
+ network 10.0.0.0
 !
 ip forward-protocol nd
 !
@@ -2237,7 +2290,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 14:41:20 UTC Fri May 13 2016
+! Last configuration change at 23:35:33 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2316,7 +2369,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.180 255.255.255.0
+ ip address 172.16.1.210 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -2503,7 +2556,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 14:41:33 UTC Fri May 13 2016
+! Last configuration change at 23:35:50 UTC Fri May 13 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2582,7 +2635,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.181 255.255.255.0
+ ip address 172.16.1.211 255.255.255.0
  duplex full
  speed auto
  media-type rj45
