@@ -10,7 +10,7 @@
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 00:36:30 UTC Sat May 14 2016 by cisco
+! Last configuration change at 23:49:10 UTC Sun May 15 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -72,7 +72,22 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TrustedCA
+ enrollment url http://10.0.0.6:80
+ fqdn Branch1-R1.dmpvn.com
+ ip-address 7.7.7.6
+ subject-name CN=Branch1-R1,O=dmpvn.com
+ revocation-check none
+ rsakeypair Branch1-R1.dmpvn.com
 !
+!
+!
+crypto pki certificate map CMAP 10
+ issuer-name co ca
+!
+crypto pki certificate chain TrustedCA
+ certificate 02 nvram:CA#2.cer
+ certificate ca 01 nvram:CA#1CA.cer
 username cisco privilege 15 secret 5 $1$PD/Y$Zy05A3ju7oWOmk2JGeKza.
 !
 redundancy
@@ -80,6 +95,10 @@ redundancy
 !
 ! 
 !
+crypto ikev2 proposal IKEv2-PROPOSAL 
+ encryption aes-cbc-128
+ integrity sha512
+ group 5
 !
 !
 crypto ikev2 keyring DMVPN-KEYRING
@@ -92,9 +111,12 @@ crypto ikev2 keyring DMVPN-KEYRING
 crypto ikev2 profile FVRF-IKEv2
  match fvrf any
  match identity remote address 0.0.0.0 
- authentication local pre-share
+ match certificate CMAP
+ identity local dn 
+ authentication local rsa-sig
  authentication remote pre-share
- keyring local DMVPN-KEYRING
+ authentication remote rsa-sig
+ pki trustpoint TrustedCA
  dpd 40 5 on-demand
 !
 !
@@ -138,7 +160,7 @@ interface Tunnel1
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.208 255.255.255.0
+ ip address 172.16.1.238 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -232,7 +254,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 00:38:05 UTC Sat May 14 2016 by cisco
+! Last configuration change at 02:21:31 UTC Mon May 16 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -290,7 +312,21 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TrustedCA
+ enrollment url http://10.0.0.6:80
+ fqdn Branch1-R2.dmvpn.com
+ subject-name CN=Branch1-R2,O=dmvpn.com
+ revocation-check crl none
+ rsakeypair Branch1-R2.dmvpn.com
 !
+!
+!
+crypto pki certificate map CMAP 10
+ issuer-name co ca
+!
+crypto pki certificate chain TrustedCA
+ certificate 06 nvram:CA#6.cer
+ certificate ca 01 nvram:CA#1CA.cer
 username cisco privilege 15 secret 5 $1$DPmN$Udm7NCfeO/hVT4b02K3zD.
 !
 redundancy
@@ -310,9 +346,11 @@ crypto ikev2 keyring DMVPN-KEYRING
 crypto ikev2 profile FVRF-IKEv2
  match fvrf any
  match identity remote address 0.0.0.0 
- authentication local pre-share
- authentication remote pre-share
- keyring local DMVPN-KEYRING
+ match certificate CMAP
+ identity local dn 
+ authentication local rsa-sig
+ authentication remote rsa-sig
+ pki trustpoint TrustedCA
  dpd 40 5 on-demand
 !
 !
@@ -356,7 +394,7 @@ interface Tunnel2
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.209 255.255.255.0
+ ip address 172.16.1.239 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -449,7 +487,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 23:34:12 UTC Fri May 13 2016
+! Last configuration change at 00:25:53 UTC Mon May 16 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -512,7 +550,21 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TrustedCA
+ enrollment url http://10.0.0.6:80
+ fqdn Branch2-R1.dmpvn.com
+ subject-name CN=Branch2-R1,O=dmpvn.com
+ revocation-check crl none
+ rsakeypair Branch2-R1.dmpvn.com
 !
+!
+!
+crypto pki certificate map CMAP 10
+ issuer-name co ca
+!
+crypto pki certificate chain TrustedCA
+ certificate 04 nvram:CA#4.cer
+ certificate ca 01 nvram:CA#1CA.cer
 username cisco privilege 15 secret 5 $1$phwo$EgkkiWohdxIzrV8U4tGub/
 !
 redundancy
@@ -532,9 +584,13 @@ crypto ikev2 keyring DMVPN-KEYRING
 crypto ikev2 profile FVRF-IKEv2
  match fvrf any
  match identity remote address 0.0.0.0 
- authentication local pre-share
+ match certificate CMAP
+ identity local dn 
+ authentication local rsa-sig
  authentication remote pre-share
+ authentication remote rsa-sig
  keyring local DMVPN-KEYRING
+ pki trustpoint TrustedCA
  dpd 40 5 on-demand
 !
 !
@@ -594,7 +650,7 @@ interface Tunnel2
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.202 255.255.255.0
+ ip address 172.16.1.232 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -623,6 +679,11 @@ interface GigabitEthernet0/3
  speed auto
  media-type rj45
  no cdp enable
+!
+!
+router eigrp 777
+ network 10.0.0.0
+ network 172.16.0.0
 !
 ip forward-protocol nd
 !
@@ -687,7 +748,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 00:48:16 UTC Sat May 14 2016 by cisco
+! Last configuration change at 00:58:28 UTC Mon May 16 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -753,6 +814,18 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-3092690934
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3092690934
+ revocation-check none
+ rsakeypair TP-self-signed-3092690934
+!
+crypto pki trustpoint TP-self-signed-3787046740
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3787046740
+ revocation-check none
+ rsakeypair TP-self-signed-3787046740
+!
 crypto pki trustpoint TP-self-signed-3538386258
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-3538386258
@@ -783,13 +856,29 @@ crypto pki trustpoint TP-self-signed-3589596084
  revocation-check none
  rsakeypair TP-self-signed-3589596084
 !
+crypto pki trustpoint TrustedCA
+ enrollment url http://10.0.0.6:80
+ fqdn DMVPNR2.dmvpn.com
+ subject-name CN=DMVPNR2,O=dmvpn.com
+ revocation-check crl none
+ rsakeypair DMVPNR2.dmvpn.com
 !
-crypto pki certificate chain TP-self-signed-3538386258
+!
+!
+crypto pki certificate map CMAP 10
+ issuer-name co ca
+!
+crypto pki certificate chain TP-self-signed-3092690934
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-3787046740
+crypto pki certificate chain TP-self-signed-3538386258
 crypto pki certificate chain TP-self-signed-1876577649
 crypto pki certificate chain TP-self-signed-1298940484
 crypto pki certificate chain TP-self-signed-827676173
 crypto pki certificate chain TP-self-signed-3589596084
+crypto pki certificate chain TrustedCA
+ certificate 05 nvram:CA#5.cer
+ certificate ca 01 nvram:CA#1CA.cer
 !
 !
 !
@@ -797,7 +886,7 @@ crypto pki certificate chain TP-self-signed-3589596084
 !
 !
 !
-license udi pid CSR1000V sn 9JUKGP44NJ8
+license udi pid CSR1000V sn 9A8XHVFPA75
 license accept end user agreement
 license boot level ax
 !
@@ -819,9 +908,12 @@ crypto ikev2 keyring DMVPN-KEYRING
 crypto ikev2 profile FVRF-IKEv2
  match fvrf DMVPN2
  match identity remote address 0.0.0.0 
- authentication local pre-share
+ match certificate CMAP
+ identity local dn 
+ authentication local rsa-sig
  authentication remote pre-share
- keyring local DMVPN-KEYRING
+ authentication remote rsa-sig
+ pki trustpoint TrustedCA
 !
 !
 !
@@ -880,7 +972,7 @@ interface Tunnel2
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.212 255.255.255.0
+ ip address 172.16.1.242 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet2
@@ -913,9 +1005,9 @@ router eigrp 777
  network 10.0.0.0
  network 172.16.0.0
  passive-interface default
+ no passive-interface Tunnel2
  no passive-interface GigabitEthernet3
  no passive-interface GigabitEthernet5
- no passive-interface Tunnel2
 !
 !
 virtual-service csr_mgmt
@@ -963,7 +1055,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 00:46:37 UTC Sat May 14 2016 by cisco
+! Last configuration change at 00:29:41 UTC Mon May 16 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1029,6 +1121,18 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-667118375
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-667118375
+ revocation-check none
+ rsakeypair TP-self-signed-667118375
+!
+crypto pki trustpoint TP-self-signed-2932676113
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2932676113
+ revocation-check none
+ rsakeypair TP-self-signed-2932676113
+!
 crypto pki trustpoint TP-self-signed-1071537903
  enrollment selfsigned
  subject-name cn=IOS-Self-Signed-Certificate-1071537903
@@ -1059,13 +1163,29 @@ crypto pki trustpoint TP-self-signed-2633728531
  revocation-check none
  rsakeypair TP-self-signed-2633728531
 !
+crypto pki trustpoint TrustedCA
+ enrollment url http://10.0.0.6:80
+ fqdn DMVPNR1.dmpvn.com
+ subject-name CN=DMVPNR1,O=dmpvn.com
+ revocation-check crl none
+ rsakeypair DMVPNR1.dmpvn.com
 !
-crypto pki certificate chain TP-self-signed-1071537903
+!
+!
+crypto pki certificate map CMAP 10
+ issuer-name co ca
+!
+crypto pki certificate chain TP-self-signed-667118375
  certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+crypto pki certificate chain TP-self-signed-2932676113
+crypto pki certificate chain TP-self-signed-1071537903
 crypto pki certificate chain TP-self-signed-4274187096
 crypto pki certificate chain TP-self-signed-1783107452
 crypto pki certificate chain TP-self-signed-1692709661
 crypto pki certificate chain TP-self-signed-2633728531
+crypto pki certificate chain TrustedCA
+ certificate 03 nvram:CA#3.cer
+ certificate ca 01 nvram:CA#1CA.cer
 !
 !
 !
@@ -1073,7 +1193,7 @@ crypto pki certificate chain TP-self-signed-2633728531
 !
 !
 !
-license udi pid CSR1000V sn 9SKWWUPPZIQ
+license udi pid CSR1000V sn 9VDF489UBHC
 license accept end user agreement
 license boot level ax
 !
@@ -1095,9 +1215,12 @@ crypto ikev2 keyring DMVPN-KEYRING
 crypto ikev2 profile FVRF-IKEv2
  match fvrf DMVPN1
  match identity remote address 0.0.0.0 
- authentication local pre-share
+ match certificate CMAP
+ identity local dn 
+ authentication local rsa-sig
  authentication remote pre-share
- keyring local DMVPN-KEYRING
+ authentication remote rsa-sig
+ pki trustpoint TrustedCA
 !
 !
 !
@@ -1156,7 +1279,7 @@ interface Tunnel1
 interface GigabitEthernet1
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.215 255.255.255.0
+ ip address 172.16.1.245 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet2
@@ -1189,9 +1312,9 @@ router eigrp 777
  network 10.0.0.0
  network 172.16.0.0
  passive-interface default
+ no passive-interface Tunnel1
  no passive-interface GigabitEthernet3
  no passive-interface GigabitEthernet5
- no passive-interface Tunnel1
 !
 !
 virtual-service csr_mgmt
@@ -1239,7 +1362,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 23:34:08 UTC Fri May 13 2016
+! Last configuration change at 01:35:09 UTC Sun May 15 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1330,7 +1453,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 172.16.1.203 255.255.255.0
+ ip address 172.16.1.233 255.255.255.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -1393,7 +1516,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 23:33:40 UTC Fri May 13 2016
+! Last configuration change at 01:34:42 UTC Sun May 15 2016
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1477,7 +1600,7 @@ interface GigabitEthernet0/0
  description OOB management
  no switchport
  vrf forwarding Mgmt-intf
- ip address 172.16.1.201 255.255.255.0
+ ip address 172.16.1.231 255.255.255.0
  negotiation auto
 !
 ip forward-protocol nd
@@ -1539,7 +1662,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 00:03:57 UTC Sat May 14 2016 by cisco
+! Last configuration change at 01:35:57 UTC Sun May 15 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1618,7 +1741,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.205 255.255.255.0
+ ip address 172.16.1.235 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -1726,7 +1849,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 23:34:51 UTC Fri May 13 2016
+! Last configuration change at 01:35:54 UTC Sun May 15 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1805,7 +1928,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.204 255.255.255.0
+ ip address 172.16.1.234 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -1922,7 +2045,7 @@ end</entry>
         <extensions>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
             <entry key="config" type="String">!
-! Last configuration change at 00:07:18 UTC Sat May 14 2016 by cisco
+! Last configuration change at 00:57:57 UTC Mon May 16 2016 by cisco
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1975,7 +2098,18 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki server CA
+ no database archive
+ grant auto
+ hash sha512
 !
+crypto pki trustpoint CA
+ revocation-check crl
+ rsakeypair CA
+!
+!
+crypto pki certificate chain CA
+ certificate ca 01 nvram:CA#1CA.cer
 username cisco privilege 15 secret 5 $1$OR96$OgQnLbrxsYEpj3Ecrhd1Q/
 !
 redundancy
@@ -2001,7 +2135,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.214 255.255.255.0
+ ip address 172.16.1.244 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -2021,7 +2155,7 @@ router eigrp 777
 ip forward-protocol nd
 !
 !
-no ip http server
+ip http server
 no ip http secure-server
 ip ssh server algorithm authentication password
 !
@@ -2290,7 +2424,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 23:35:33 UTC Fri May 13 2016
+! Last configuration change at 01:36:33 UTC Sun May 15 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2369,7 +2503,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.210 255.255.255.0
+ ip address 172.16.1.240 255.255.255.0
  duplex full
  speed auto
  media-type rj45
@@ -2556,7 +2690,7 @@ write_files:
             <extensions>
                 <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
                 <entry key="config" type="String">!
-! Last configuration change at 23:35:50 UTC Fri May 13 2016
+! Last configuration change at 01:36:43 UTC Sun May 15 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -2635,7 +2769,7 @@ interface Loopback0
 interface GigabitEthernet0/0
  description OOB Management
  vrf forwarding Mgmt-intf
- ip address 172.16.1.211 255.255.255.0
+ ip address 172.16.1.241 255.255.255.0
  duplex full
  speed auto
  media-type rj45
